@@ -2,6 +2,17 @@ let express=require('express')
 
 let app =express()
 
+app.get('/',(req,res)=>{
+   console.log('user hit the request')
+res.status(200).send('home page')
+})
+app.get('/about',(req,res)=>{
+   console.log('user hit the about page')
+res.status(200).send('about page')
+})
+app.all('*',(req,res)=>{
+   res.status(404).send('<h1>resource not found</h1>')
+})
 app.listen(5001,()=>{
    console.log('server is listen on port: 5001...')
 })
