@@ -1,22 +1,71 @@
-let express =require('express')
-let app = express()
-let {people}=require('./data')
-let {products}=require('./data')
-app.get('/',(req,res)=>{
-    //res.json(products)
-     res.status(200).send('<h1>home page </h1><a href = "/products">products</a>')
-    console.log("on people")
-    
-})
-app.get('/products',(req,res)=>{
-    let  newProducts=products.map((product)=>{
-        let {id,name,image}=product
-        return {id,name,image}
-    })
-    res.json(newProducts)
-    console.log('on products')
-   
-})
-app.listen(5000,()=>{
-    console.log('server is listen on port:5000....')
-})
+const express = require('express');
+const app = express();
+const { people } = require('./data');
+const { products } = require('./data');
+
+// المسار الرئيسي
+app.get('/', (req, res) => {
+    res.status(200).send('<h1>Home Page</h1><a href="/products">Products</a>');
+    console.log('On Home Page');
+});
+
+// مسار المنتجات
+app.get('/products', (req, res) => {
+    const newProducts = products.map((product) => {
+        const { id, name, image } = product;
+        return { id, name, image };
+    });
+    res.json(newProducts);
+    console.log('On Products');
+});
+
+// مسار المنتجات مع الاستعلام
+app.get('/api/v1/query', (req, res) => {
+    const { search, limit } = req.query;
+    let sortedProducts = [...products];
+
+    if (search) {
+        sortedProducts = sortedProducts.filter((product) => product.name.startsWith(search));
+    }
+
+    if (limit) {
+        sortedProducts = sortedProducts.slice(0, Number(limit));
+    }
+
+    if (sortedProducts.length < 1) {
+        
+        return res.status(200).json({search:true,data:[]})
+        //res.status(200).send('No products match your search.');
+        
+        
+    }
+
+    res.status(200).json(sortedProducts);
+    console.log(req.query);
+    console.log('On Query');
+
+});
+
+// مسار منتج معين
+app.get('/products/:productID', (req, res) => {
+    const { productID } = req.params;
+    const singleProduct = products.find((product) => product.id === Number(productID));
+
+    if (!singleProduct) {
+        return res.status(404).send('Product does not exist');
+    }
+
+    return res.json(singleProduct);
+});
+
+// مسار المراجعات لمنتج معين
+app.get('/products/:productID/reviews/:reviewID', (req, res) => {
+    res.send('Hello from simple server :)');
+    console.log(req.params);
+});
+
+// بدء تشغيل الخادم
+const PORT = 5000;
+app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}...`);
+});
