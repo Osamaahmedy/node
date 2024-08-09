@@ -3,15 +3,24 @@ let app = express()
 let logger=require('./logger')
 let authorize=require('./middleware')
 let morgan =require('morgan')
+let  { people } = require('./data');
 
 // req => middleware => res
-//app.use([logger,authorize])
-// api/home/about/products
+
 app.use(morgan('tiny'))
 app.use([logger,authorize])
 app.get('/',(req,res)=>{
+    try {
     console.log(req.user)
-    res.status(200).send(`<h1>Home</h1>`)
+    console.log('good')
+    res.status(200).json(people)
+   } catch (error) {
+    console.error(error)
+  
+    res.status(500).send('Server Error');
+   }finally{
+    console.log(req.user)
+   }
     
 })
 app.get('/about',(req,res)=>{

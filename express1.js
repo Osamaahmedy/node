@@ -3,7 +3,7 @@ const app = express();
 const { people } = require('./data');
 const { products } = require('./data');
 
-// المسار الرئيسي
+// first path
 app.get('/', (req, res) => {
     res.status(200).send('<h1>Home Page</h1><a href="/products">Products</a>');
     console.log('On Home Page');
@@ -18,35 +18,24 @@ app.get('/products', (req, res) => {
     res.json(newProducts);
     console.log('On Products');
 });
-
-// مسار المنتجات مع الاستعلام
 app.get('/api/v1/query', (req, res) => {
     const { search, limit } = req.query;
     let sortedProducts = [...products];
-
     if (search) {
         sortedProducts = sortedProducts.filter((product) => product.name.startsWith(search));
     }
-
     if (limit) {
         sortedProducts = sortedProducts.slice(0, Number(limit));
     }
-
     if (sortedProducts.length < 1) {
-        
         return res.status(200).json({search:true,data:[]})
         //res.status(200).send('No products match your search.');
-        
-        
     }
-
     res.status(200).json(sortedProducts);
     console.log(req.query);
     console.log('On Query');
-
 });
-
-// مسار منتج معين
+// path
 app.get('/products/:productID', (req, res) => {
     const { productID } = req.params;
     const singleProduct = products.find((product) => product.id === Number(productID));
